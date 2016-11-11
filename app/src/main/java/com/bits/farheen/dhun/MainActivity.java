@@ -43,11 +43,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void initViews(){
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(viewPagerAdapter);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -61,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    void initViews(){
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(viewPagerAdapter);
+    }
+
     class ViewPagerAdapter extends FragmentStatePagerAdapter{
 
         String[] pagerTitles = {"Albums", "Artists", "Songs", "PlayLists"};
@@ -71,7 +71,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return new SongsFragment();
+            if(position == 0){
+                return new SongsFragment();
+            }
+            else {
+                return new ArtistsFragment();
+            }
         }
 
         @Override

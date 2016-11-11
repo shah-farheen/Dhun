@@ -39,11 +39,11 @@ public class SongsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        querySongs();
         return inflater.inflate(R.layout.fragment_songs, container, false);
     }
 
     public void querySongs(){
-
         List<SongsModel> songsList = new ArrayList<>();
 
         String[] projectionColumns = {MediaStore.Audio.Media._ID,
@@ -67,6 +67,7 @@ public class SongsFragment extends Fragment {
                 Log.d(TAG, "querySongs: " + songsModel.toString());
             }
             songsCursor.close();
+            Log.e(TAG, "querySongs: " + songsList.size());
         }
 
     }
