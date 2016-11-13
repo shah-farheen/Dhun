@@ -6,15 +6,21 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bits.farheen.dhun.adapters.SongsListAdapter;
 import com.bits.farheen.dhun.models.SongsModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 /**
@@ -35,15 +41,20 @@ public class SongsFragment extends Fragment {
         mContext = context;
     }
 
+    @BindView(R.id.recycler_songs) RecyclerView recyclerSongs;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        querySongs();
-        return inflater.inflate(R.layout.fragment_songs, container, false);
+        View view = inflater.inflate(R.layout.fragment_songs, container, false);
+        ButterKnife.bind(this, view);
+
+        SongsListAdapter songsListAdapter = new SongsListAdapter(querySongs(), mContext);
+        recyclerSongs.setLayoutManager(new LinearLayoutManager(mContext));
+        recyclerSongs.setAdapter(songsListAdapter);
+        return view;
     }
 
-    public void querySongs(){
+    public List<SongsModel> querySongs(){
         List<SongsModel> songsList = new ArrayList<>();
 
         String[] projectionColumns = {MediaStore.Audio.Media._ID,
@@ -69,7 +80,7 @@ public class SongsFragment extends Fragment {
             songsCursor.close();
             Log.e(TAG, "querySongs: " + songsList.size());
         }
-
+        return songsList;
     }
 
 }

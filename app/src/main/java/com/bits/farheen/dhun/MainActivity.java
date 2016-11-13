@@ -4,12 +4,15 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.view_pager) ViewPager viewPager;
+    @BindView(R.id.tab_layout) TabLayout tabLayout;
 
     @SuppressLint("InlinedApi")
     @Override
@@ -59,9 +63,10 @@ public class MainActivity extends AppCompatActivity {
     void initViews(){
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
-    class ViewPagerAdapter extends FragmentStatePagerAdapter{
+    class ViewPagerAdapter extends FragmentPagerAdapter{
 
         String[] pagerTitles = {"Albums", "Artists", "Songs", "PlayLists"};
 
@@ -82,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return pagerTitles.length;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return pagerTitles[position];
         }
     }
 }
