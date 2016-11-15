@@ -52,7 +52,6 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
     }
 
     class SongViewHolder extends RecyclerView.ViewHolder{
-
         @BindView(R.id.image_song_thumb) ImageView imageSongThumb;
         @BindView(R.id.text_song_title) TextView textSongTitle;
         @BindView(R.id.text_song_artist) TextView textSongArtist;

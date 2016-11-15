@@ -3,18 +3,16 @@ package com.bits.farheen.dhun;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     class ViewPagerAdapter extends FragmentPagerAdapter{
 
-        String[] pagerTitles = {"Albums", "Artists", "Songs", "PlayLists"};
+        String[] pagerTitles = {"Artists", "Albums", "Songs", "PlayLists"};
 
         ViewPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -76,11 +74,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            if(position == 0){
-                return new SongsFragment();
-            }
-            else {
-                return new ArtistsFragment();
+            switch (position){
+                case 0 :
+                    return new ArtistsFragment();
+                case 1 :
+                    return new AlbumsFragment();
+                case 2 :
+                    return new SongsFragment();
+                case 3 :
+                    return new PlaylistsFragment();
+                default :
+                    return null;
             }
         }
 

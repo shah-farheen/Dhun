@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="10dp"
+    tools:ignore="RtlHardcoded">
+
+    <ImageView
+        android:id="@+id/image_album_thumb"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/music"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:id="@+id/text_album_artist"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:maxLength="15"
+        android:maxLines="1"
+        android:textSize="14sp"
+        android:paddingLeft="3dp"
+        android:paddingStart="3dp"
+        android:paddingRight="2dp"
+        android:paddingEnd="2dp"
+        android:gravity="center_vertical"
+        android:layout_alignBottom="@id/image_album_thumb"
+        android:text="Jagjit Singh"/>
+
+    <TextView
+        android:id="@+id/text_album_name"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:textSize="16sp"
+        android:maxLines="1"
+        android:gravity="center"
+        android:layout_above="@id/text_album_artist"
+        android:text="Ghazals of Jagjit Singh"/>
+
+    <TextView
+        android:id="@+id/text_num_songs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@android:color/white"
+        android:layout_toRightOf="@id/text_album_artist"
+        android:layout_toEndOf="@id/text_album_artist"
+        android:layout_alignRight="@id/image_album_thumb"
+        android:layout_alignEnd="@id/image_album_thumb"
+        android:layout_alignBottom="@id/image_album_thumb"
+        android:text="20"/>
+
+</RelativeLayout>

@@ -64,7 +64,7 @@ public class SongsFragment extends Fragment {
                                       MediaStore.Audio.Media.DURATION};
 
         Cursor songsCursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projectionColumns, null, null, MediaStore.Audio.Media.TITLE);
+                projectionColumns, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 
         if(songsCursor != null){
             while (songsCursor.moveToNext()){
@@ -75,7 +75,6 @@ public class SongsFragment extends Fragment {
                 songsModel.setAlbum(songsCursor.getString(songsCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
                 songsModel.setDuration(songsCursor.getLong(songsCursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
                 songsList.add(songsModel);
-                Log.d(TAG, "querySongs: " + songsModel.toString());
             }
             songsCursor.close();
             Log.e(TAG, "querySongs: " + songsList.size());

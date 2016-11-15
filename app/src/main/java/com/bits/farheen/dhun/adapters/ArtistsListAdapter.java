@@ -1,0 +1,65 @@
+package com.bits.farheen.dhun.adapters;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bits.farheen.dhun.R;
+import com.bits.farheen.dhun.models.ArtistModel;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/**
+ * Created by farheen on 11/16/16
+ */
+
+public class ArtistsListAdapter extends RecyclerView.Adapter<ArtistsListAdapter.ArtistHolder>{
+
+    private Context mContext;
+    private LayoutInflater inflater;
+    private List<ArtistModel> artistList;
+
+    public ArtistsListAdapter(List<ArtistModel> artistList, Context context){
+        this.artistList = artistList;
+        mContext = context;
+        inflater = LayoutInflater.from(mContext);
+    }
+
+    @Override
+    public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = inflater.inflate(R.layout.single_artist, parent, false);
+        return new ArtistHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(ArtistHolder holder, int position) {
+        ArtistModel currentArtist = artistList.get(position);
+        holder.textArtistName.setText(currentArtist.getArtist());
+        holder.textNumAlbums.setText(currentArtist.getNumAlbums());
+        holder.textNumTracks.setText(currentArtist.getNumTracks());
+    }
+
+    @Override
+    public int getItemCount() {
+        return artistList.size();
+    }
+
+    class ArtistHolder extends RecyclerView.ViewHolder{
+        @BindView(R.id.image_artist_thumb) ImageView imageArtistThumb;
+        @BindView(R.id.text_artist_name) TextView textArtistName;
+        @BindView(R.id.text_num_albums) TextView textNumAlbums;
+        @BindView(R.id.text_num_tracks) TextView textNumTracks;
+
+        ArtistHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
+}
