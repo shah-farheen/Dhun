@@ -1,6 +1,9 @@
 package com.bits.farheen.dhun.adapters;
 
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.SongsModel;
 
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,10 +44,26 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
 
     @Override
     public void onBindViewHolder(SongViewHolder holder, int position) {
-        SongsModel currentSong = songsList.get(position);
+        final SongsModel currentSong = songsList.get(position);
         holder.textSongTitle.setText(currentSong.getTitle());
         holder.textSongArtist.setText(currentSong.getArtist());
         holder.textSongAlbum.setText(currentSong.getAlbum());
+
+        holder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri songUri = Uri.parse(currentSong.getDataUri());
+                MediaPlayer mediaPlayer = new MediaPlayer();
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                try {
+                    mediaPlayer.setDataSource(mContext, songUri);
+                    mediaPlayer.prepare();
+                    mediaPlayer.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -56,6 +76,7 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         @BindView(R.id.text_song_title) TextView textSongTitle;
         @BindView(R.id.text_song_artist) TextView textSongArtist;
         @BindView(R.id.text_song_album) TextView textSongAlbum;
+        @BindView(R.id.root_view) View rootView;
 
         SongViewHolder(View itemView) {
             super(itemView);

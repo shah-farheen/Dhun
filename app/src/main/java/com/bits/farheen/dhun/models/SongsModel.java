@@ -10,9 +10,14 @@ public class SongsModel {
     private String artist;
     private String album;
     private long duration;
+    private String dataUri;
 
     public SongsModel() {
 
+    }
+
+    public String getDataUri() {
+        return dataUri;
     }
 
     public long getSongId() {
@@ -55,6 +60,10 @@ public class SongsModel {
         this.duration = duration;
     }
 
+    public void setDataUri(String dataUri) {
+        this.dataUri = dataUri;
+    }
+
     @Override
     public String toString() {
         return "SongsModel{" +
@@ -63,6 +72,7 @@ public class SongsModel {
                 ", artist='" + artist + '\'' +
                 ", album='" + album + '\'' +
                 ", duration=" + duration +
+                ", dataUri='" + dataUri + '\'' +
                 '}';
     }
 }

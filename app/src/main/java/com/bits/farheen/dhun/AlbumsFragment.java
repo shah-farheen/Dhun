@@ -75,7 +75,6 @@ public class AlbumsFragment extends Fragment {
                 albumModel.setArtist(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST)));
                 albumModel.setNumSongs(albumsCursor.getInt(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS)));
                 albumList.add(albumModel);
-                Log.d(TAG, "queryAlbums: " + albumModel.toString());
             }
             albumsCursor.close();
             Log.e(TAG, "queryAlbums: " + albumList.size());
