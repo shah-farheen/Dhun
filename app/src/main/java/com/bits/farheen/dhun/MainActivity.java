@@ -10,13 +10,22 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bits.farheen.dhun.events.OpenAlbumDetails;
+import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.utils.Constants;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,8 +33,12 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.view_pager) ViewPager viewPager;
-    @BindView(R.id.tab_layout) TabLayout tabLayout;
+    @BindView(R.id.text_song_name) TextView textSongName;
+    @BindView(R.id.text_song_artist) TextView textSongArtist;
+    @BindView(R.id.image_play_pause) ImageView imagePlayPause;
+    @BindView(R.id.frag_container) FrameLayout fragContainer;
+
+    private FragmentManager fragmentManager;
 
     @SuppressLint("InlinedApi")
     @Override
@@ -34,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        fragmentManager = getSupportFragmentManager();
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED){
@@ -43,6 +57,18 @@ public class MainActivity extends AppCompatActivity {
         else {
             initViews();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     @Override
@@ -59,43 +85,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void initViews(){
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(viewPagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
+        fragmentManager.beginTransaction()
+                .add(R.id.frag_container, new TabsFragment())
+                .commit();
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter{
+    @Subscribe
+    public void openAlbumDetails(AlbumModel album){
+        Bundle albumBundle = new Bundle();
+        albumBundle.putString(Constants.ALBUM_KEY, album.getKey());
+        albumBundle.putInt(Constants.NUM_SONGS, album.getNumSongs());
+        albumBundle.putString(Constants.ALBUM_NAME, album.getName());
+        albumBundle.putString(Constants.ALBUM_ART, album.getAlbumArt());
 
-        String[] pagerTitles = {"Artists", "Albums", "Songs", "PlayLists"};
+        AlbumDetailsFragment albumDetailsFragment = new AlbumDetailsFragment();
+        albumDetailsFragment.setArguments(albumBundle);
 
-        ViewPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position){
-                case 0 :
-                    return new ArtistsFragment();
-                case 1 :
-                    return new AlbumsFragment();
-                case 2 :
-                    return new SongsFragment();
-                case 3 :
-                    return new PlaylistsFragment();
-                default :
-                    return null;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return pagerTitles.length;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return pagerTitles[position];
-        }
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .add(R.id.frag_container, albumDetailsFragment)
+                .addToBackStack(null)
+                .commit();
     }
+
 }

@@ -9,8 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bits.farheen.dhun.R;
+import com.bits.farheen.dhun.events.OpenAlbumDetails;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bumptech.glide.Glide;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -41,7 +44,7 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Albu
 
     @Override
     public void onBindViewHolder(AlbumHolder holder, int position) {
-        AlbumModel currentAlbum = albumList.get(position);
+        final AlbumModel currentAlbum = albumList.get(position);
         holder.textAlbumName.setText(currentAlbum.getName());
         holder.textAlbumArtist.setText(currentAlbum.getArtist());
         String stringNumSongs = currentAlbum.getNumSongs() + " songs";
@@ -51,6 +54,13 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Albu
                 .fitCenter()
                 .placeholder(R.drawable.music)
                 .into(holder.imageArtistThumb);
+
+        holder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(currentAlbum);
+            }
+        });
     }
 
     @Override
@@ -64,6 +74,7 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Albu
         @BindView(R.id.text_album_name) TextView textAlbumName;
         @BindView(R.id.text_album_artist) TextView textAlbumArtist;
         @BindView(R.id.text_num_songs) TextView textNumSongs;
+        @BindView(R.id.root_view) View rootView;
 
         AlbumHolder(View itemView) {
             super(itemView);

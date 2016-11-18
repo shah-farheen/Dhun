@@ -1,6 +1,7 @@
 package com.bits.farheen.dhun.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -11,8 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bits.farheen.dhun.PlayMusicService;
 import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.SongsModel;
+import com.bits.farheen.dhun.utils.Constants;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,16 +55,9 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri songUri = Uri.parse(currentSong.getDataUri());
-                MediaPlayer mediaPlayer = new MediaPlayer();
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                try {
-                    mediaPlayer.setDataSource(mContext, songUri);
-                    mediaPlayer.prepare();
-                    mediaPlayer.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Intent playMusicIntent = new Intent(mContext, PlayMusicService.class);
+                playMusicIntent.putExtra(Constants.SONG_PATH, currentSong.getDataUri());
+                mContext.startService(playMusicIntent);
             }
         });
     }
