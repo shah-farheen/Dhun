@@ -75,7 +75,6 @@ public class ArtistsFragment extends Fragment {
                 artistsList.add(artistModel);
             }
             artistsCursor.close();
-            Log.e(TAG, "queryArtists: " + artistsList.size());
         }
         return artistsList;
     }

@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bits.farheen.dhun.R;
-import com.bits.farheen.dhun.events.OpenAlbumDetails;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bumptech.glide.Glide;
 

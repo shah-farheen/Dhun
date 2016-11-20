@@ -79,7 +79,6 @@ public class SongsFragment extends Fragment {
                 songsList.add(songsModel);
             }
             songsCursor.close();
-            Log.e(TAG, "querySongs: " + songsList.size());
         }
         return songsList;
     }

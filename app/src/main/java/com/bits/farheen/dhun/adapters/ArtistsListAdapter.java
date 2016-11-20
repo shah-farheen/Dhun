@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.ArtistModel;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,10 +42,17 @@ public class ArtistsListAdapter extends RecyclerView.Adapter<ArtistsListAdapter.
 
     @Override
     public void onBindViewHolder(ArtistHolder holder, int position) {
-        ArtistModel currentArtist = artistList.get(position);
+        final ArtistModel currentArtist = artistList.get(position);
         holder.textArtistName.setText(currentArtist.getArtist());
         holder.textNumAlbums.setText(currentArtist.getNumAlbums());
         holder.textNumTracks.setText(currentArtist.getNumTracks());
+
+        holder.rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(currentArtist);
+            }
+        });
     }
 
     @Override
@@ -56,6 +65,7 @@ public class ArtistsListAdapter extends RecyclerView.Adapter<ArtistsListAdapter.
         @BindView(R.id.text_artist_name) TextView textArtistName;
         @BindView(R.id.text_num_albums) TextView textNumAlbums;
         @BindView(R.id.text_num_tracks) TextView textNumTracks;
+        @BindView(R.id.root_view) View rootView;
 
         ArtistHolder(View itemView) {
             super(itemView);

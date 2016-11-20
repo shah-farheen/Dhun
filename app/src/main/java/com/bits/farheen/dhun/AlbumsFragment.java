@@ -77,7 +77,6 @@ public class AlbumsFragment extends Fragment {
                 albumList.add(albumModel);
             }
             albumsCursor.close();
-            Log.e(TAG, "queryAlbums: " + albumList.size());
         }
         return albumList;
     }

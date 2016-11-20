@@ -2,6 +2,7 @@ package com.bits.farheen.dhun;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,12 +11,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bits.farheen.dhun.events.PauseMusic;
+import com.bits.farheen.dhun.events.PlayMusic;
 import com.bits.farheen.dhun.models.AlbumModel;
+import com.bits.farheen.dhun.models.ArtistModel;
 import com.bits.farheen.dhun.utils.Constants;
 
 import org.greenrobot.eventbus.EventBus;
@@ -33,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.frag_container) FrameLayout fragContainer;
 
     private FragmentManager fragmentManager;
+    private SharedPreferences dataFile;
+    private static final String TAG = "MainActivity";
 
     @SuppressLint("InlinedApi")
     @Override
@@ -42,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         fragmentManager = getSupportFragmentManager();
+        dataFile = getSharedPreferences(Constants.DATA_FILE, MODE_PRIVATE);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED){
@@ -51,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         else {
             initViews();
         }
+
+        initListeners();
     }
 
     @Override
@@ -78,10 +89,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    void initListeners(){
+        imagePlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // If music is playing then pause it
+                if(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false)){
+                    EventBus.getDefault().post(new PauseMusic());
+                    imagePlayPause.setImageResource(R.drawable.play);
+                }
+                else {
+                    EventBus.getDefault().post(new PlayMusic());
+                    imagePlayPause.setImageResource(R.drawable.pause);
+                }
+            }
+        });
+    }
+
     void initViews(){
         fragmentManager.beginTransaction()
                 .add(R.id.frag_container, new TabsFragment())
                 .commit();
+
+        if(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false)){
+            imagePlayPause.setImageResource(R.drawable.pause);
+        }
+        else {
+            imagePlayPause.setImageResource(R.drawable.play);
+        }
     }
 
     @Subscribe
@@ -98,6 +133,22 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager.beginTransaction()
                 .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                 .add(R.id.frag_container, albumDetailsFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    @Subscribe
+    public void openArtistDetails(ArtistModel artist){
+        Bundle artistBundle = new Bundle();
+        artistBundle.putString(Constants.ARTIST_KEY, artist.getKey());
+        artistBundle.putString(Constants.ARTIST_NAME, artist.getArtist());
+
+        ArtistDetailsFragment artistDetailsFragment = new ArtistDetailsFragment();
+        artistDetailsFragment.setArguments(artistBundle);
+
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .add(R.id.frag_container, artistDetailsFragment)
                 .addToBackStack(null)
                 .commit();
     }

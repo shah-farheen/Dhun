@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context="com.bits.farheen.dhun.ArtistDetailsFragment">
+
+    <TextView
+        android:id="@+id/text_artist_initials"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="Ja"
+        android:textSize="50sp"
+        android:gravity="center"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_blue_light"/>
+
+    <TextView
+        android:id="@+id/text_albums"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Albums"
+        android:layout_below="@id/text_artist_initials"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_albums"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_albums"/>
+
+    <TextView
+        android:id="@+id/text_songs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="All Songs"
+        android:layout_below="@id/recycler_albums"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_songs"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/text_songs"/>
+
+</RelativeLayout>

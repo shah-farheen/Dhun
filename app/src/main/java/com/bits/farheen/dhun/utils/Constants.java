@@ -13,4 +13,11 @@ public class Constants {
     public static final String NUM_SONGS = "NUM_SONGS";
     public static final String ALBUM_ART = "ALBUM_ART";
     public static final String ALBUM_NAME = "ALBUM_NAME";
+
+    public static final String ARTIST_KEY = "ARTIST_KEY";
+    public static final String ARTIST_NAME = "ARTIST_NAME";
+
+    public static final String IS_MUSIC_PLAYING = "IS_MUSIC_PLAYING";
+
+    public static final String DATA_FILE = "DATA_FILE";
 }

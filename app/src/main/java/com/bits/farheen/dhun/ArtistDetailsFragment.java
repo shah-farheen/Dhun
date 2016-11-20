@@ -7,19 +7,18 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.bits.farheen.dhun.adapters.AlbumListAdapter;
 import com.bits.farheen.dhun.adapters.SongsListAdapter;
+import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
-import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +30,13 @@ import butterknife.ButterKnife;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AlbumDetailsFragment extends Fragment {
+public class ArtistDetailsFragment extends Fragment {
 
     private Context mContext;
     private Bundle dataBundle;
-    private static final String TAG = "AlbumDetailsFragment";
+    private static final String TAG = "ArtistDetailsFragment";
 
-    public AlbumDetailsFragment() {
+    public ArtistDetailsFragment() {
         // Required empty public constructor
     }
 
@@ -53,26 +52,19 @@ public class AlbumDetailsFragment extends Fragment {
         dataBundle = getArguments();
     }
 
-    @BindView(R.id.image_album_thumb) ImageView imageAlbumThumb;
-    @BindView(R.id.text_album_name) TextView textAlbumName;
-    @BindView(R.id.text_num_songs) TextView textNumSongs;
+    @BindView(R.id.recycler_albums) RecyclerView recyclerAlbums;
     @BindView(R.id.recycler_songs) RecyclerView recyclerSongs;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_album_details, container, false);
+        View view = inflater.inflate(R.layout.fragment_artist_details, container, false);
         ButterKnife.bind(this, view);
 
-        Glide.with(mContext).load(dataBundle.getString(Constants.ALBUM_ART))
-                .placeholder(R.drawable.music)
-                .into(imageAlbumThumb);
-        textAlbumName.setText(dataBundle.getString(Constants.ALBUM_NAME));
-        String stringNumSongs = dataBundle.getInt(Constants.NUM_SONGS) + " songs";
-        textNumSongs.setText(stringNumSongs);
-
-        SongsListAdapter songsListAdapter = new SongsListAdapter(querySongs(), mContext);
         recyclerSongs.setLayoutManager(new LinearLayoutManager(mContext));
-        recyclerSongs.setAdapter(songsListAdapter);
+        recyclerSongs.setAdapter(new SongsListAdapter(querySongs(), mContext));
+
+        recyclerAlbums.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        recyclerAlbums.setAdapter(new AlbumListAdapter(queryAlbums(), mContext));
 
         return view;
     }
@@ -89,8 +81,8 @@ public class AlbumDetailsFragment extends Fragment {
 
         Cursor songsCursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projectionColumns,
-                MediaStore.Audio.Media.ALBUM_KEY + "=?",
-                new String[]{dataBundle.getString(Constants.ALBUM_KEY)},
+                MediaStore.Audio.Media.ARTIST_KEY + "=?",
+                new String[]{dataBundle.getString(Constants.ARTIST_KEY)},
                 MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 
         if(songsCursor != null){
@@ -107,6 +99,35 @@ public class AlbumDetailsFragment extends Fragment {
             songsCursor.close();
         }
         return songsList;
+    }
+
+    public List<AlbumModel> queryAlbums(){
+        List<AlbumModel> albumList = new ArrayList<>();
+        String[] projectionColumns = {MediaStore.Audio.Albums.ALBUM_ART,
+                MediaStore.Audio.Albums.ALBUM_KEY,
+                MediaStore.Audio.Albums.ALBUM,
+                MediaStore.Audio.Albums.ARTIST,
+                MediaStore.Audio.Albums.NUMBER_OF_SONGS};
+
+        Cursor albumsCursor = mContext.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                projectionColumns,
+                MediaStore.Audio.Albums.ARTIST + "=?",
+                new String[]{dataBundle.getString(Constants.ARTIST_NAME)},
+                MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
+
+        if(albumsCursor != null){
+            while (albumsCursor.moveToNext()){
+                AlbumModel albumModel = new AlbumModel();
+                albumModel.setAlbumArt(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART)));
+                albumModel.setKey(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_KEY)));
+                albumModel.setName(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM)));
+                albumModel.setArtist(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST)));
+                albumModel.setNumSongs(albumsCursor.getInt(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS)));
+                albumList.add(albumModel);
+            }
+            albumsCursor.close();
+        }
+        return albumList;
     }
 
 }
