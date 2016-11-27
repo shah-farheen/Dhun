@@ -20,6 +20,7 @@ public class Constants {
     public static final String ARTIST_NAME = "ARTIST_NAME";
 
     public static final String IS_MUSIC_PLAYING = "IS_MUSIC_PLAYING";
+    public static final String CURRENT_MUSIC_QUEUE = "CURRENT_MUSIC_QUEUE";
 
     public static final String DATA_FILE = "DATA_FILE";
 }

@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -32,7 +31,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.toolbar_main_activity) Toolbar toolbar;
     @BindView(R.id.text_song_name) TextView textSongName;
     @BindView(R.id.text_song_artist) TextView textSongArtist;
     @BindView(R.id.image_play_pause) ImageView imagePlayPause;

@@ -2,6 +2,7 @@ package com.bits.farheen.dhun.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -16,8 +17,12 @@ import com.bits.farheen.dhun.PlayMusicService;
 import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -29,14 +34,19 @@ import butterknife.ButterKnife;
 
 public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.SongViewHolder>{
 
+    private Gson gson;
     private Context mContext;
     private LayoutInflater inflater;
-    private List<SongsModel> songsList;
+    private ArrayList<SongsModel> songsList;
+    private SharedPreferences dataFile;
+    private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
-    public SongsListAdapter(List<SongsModel> songsList, Context context){
+    public SongsListAdapter(ArrayList<SongsModel> songsList, Context context){
         mContext = context;
+        gson = new Gson();
         inflater = LayoutInflater.from(mContext);
         this.songsList = songsList;
+        dataFile = mContext.getSharedPreferences(Constants.DATA_FILE, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -47,7 +57,7 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
 
     @Override
     public void onBindViewHolder(SongViewHolder holder, int position) {
-        final SongsModel currentSong = songsList.get(position);
+        SongsModel currentSong = songsList.get(position);
         holder.textSongTitle.setText(currentSong.getTitle());
         holder.textSongArtist.setText(currentSong.getArtist());
         holder.textSongAlbum.setText(currentSong.getAlbum());
@@ -55,8 +65,9 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(songsList, songListType)).apply();
                 Intent playMusicIntent = new Intent(mContext, PlayMusicService.class);
-                playMusicIntent.putExtra(Constants.SONG_PATH, currentSong.getDataUri());
+                playMusicIntent.putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(songsList, songListType));
                 mContext.startService(playMusicIntent);
             }
         });

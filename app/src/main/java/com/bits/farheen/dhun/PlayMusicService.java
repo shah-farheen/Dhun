@@ -21,6 +21,7 @@ import android.util.Log;
 import com.bits.farheen.dhun.events.PauseMusic;
 import com.bits.farheen.dhun.events.PlayMusic;
 import com.bits.farheen.dhun.utils.Constants;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,6 +34,7 @@ import java.io.IOException;
 
 public class PlayMusicService extends Service implements MediaPlayer.OnCompletionListener{
 
+    private Gson gson;
     private MediaPlayer mediaPlayer;
     private ServiceHandler mServiceHandler;
     private SharedPreferences dataFile;
@@ -51,6 +53,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
 
     @Override
     public void onCreate() {
+        gson = new Gson();
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mediaPlayer.setOnCompletionListener(this);
