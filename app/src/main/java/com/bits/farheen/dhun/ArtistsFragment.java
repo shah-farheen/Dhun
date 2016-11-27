@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.bits.farheen.dhun.adapters.ArtistsListAdapter;
 import com.bits.farheen.dhun.models.ArtistModel;
+import com.bits.farheen.dhun.utils.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,34 +49,11 @@ public class ArtistsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_artists, container, false);
         ButterKnife.bind(this, view);
 
-        ArtistsListAdapter adapter = new ArtistsListAdapter(queryArtists(), mContext);
+        ArtistsListAdapter adapter = new ArtistsListAdapter(Utility.queryArtists(mContext, null, null), mContext);
         recyclerArtists.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerArtists.setAdapter(adapter);
 
         return view;
     }
 
-    public List<ArtistModel> queryArtists(){
-        List<ArtistModel> artistsList = new ArrayList<>();
-        String[] projectionColumns = {MediaStore.Audio.Artists.ARTIST_KEY,
-                                      MediaStore.Audio.Artists.ARTIST,
-                                      MediaStore.Audio.Artists.NUMBER_OF_ALBUMS,
-                                      MediaStore.Audio.Artists.NUMBER_OF_TRACKS};
-
-        Cursor artistsCursor = mContext.getContentResolver().query(MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-                projectionColumns, null, null, MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
-
-        if(artistsCursor != null){
-            while (artistsCursor.moveToNext()){
-                ArtistModel artistModel = new ArtistModel();
-                artistModel.setKey(artistsCursor.getString(artistsCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST_KEY)));
-                artistModel.setArtist(artistsCursor.getString(artistsCursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST)));
-                artistModel.setNumAlbums(artistsCursor.getString(artistsCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS)));
-                artistModel.setNumTracks(artistsCursor.getString(artistsCursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS)));
-                artistsList.add(artistModel);
-            }
-            artistsCursor.close();
-        }
-        return artistsList;
-    }
 }

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.bits.farheen.dhun.adapters.SongsListAdapter;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
+import com.bits.farheen.dhun.utils.Utility;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
@@ -70,43 +71,14 @@ public class AlbumDetailsFragment extends Fragment {
         String stringNumSongs = dataBundle.getInt(Constants.NUM_SONGS) + " songs";
         textNumSongs.setText(stringNumSongs);
 
-        SongsListAdapter songsListAdapter = new SongsListAdapter(querySongs(), mContext);
+        SongsListAdapter songsListAdapter = new SongsListAdapter(Utility.querySongs(mContext,
+                MediaStore.Audio.Media.ALBUM_KEY,
+                new String[]{dataBundle.getString(Constants.ALBUM_KEY)}), mContext);
+
         recyclerSongs.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerSongs.setAdapter(songsListAdapter);
 
         return view;
-    }
-
-    public List<SongsModel> querySongs(){
-        List<SongsModel> songsList = new ArrayList<>();
-
-        String[] projectionColumns = {MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.ALBUM,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.DATA};
-
-        Cursor songsCursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projectionColumns,
-                MediaStore.Audio.Media.ALBUM_KEY + "=?",
-                new String[]{dataBundle.getString(Constants.ALBUM_KEY)},
-                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-
-        if(songsCursor != null){
-            while (songsCursor.moveToNext()){
-                SongsModel songsModel = new SongsModel();
-                songsModel.setSongId(songsCursor.getLong(songsCursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                songsModel.setTitle(songsCursor.getString(songsCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-                songsModel.setArtist(songsCursor.getString(songsCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
-                songsModel.setAlbum(songsCursor.getString(songsCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
-                songsModel.setDuration(songsCursor.getLong(songsCursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
-                songsModel.setDataUri(songsCursor.getString(songsCursor.getColumnIndex(MediaStore.Audio.Media.DATA)));
-                songsList.add(songsModel);
-            }
-            songsCursor.close();
-        }
-        return songsList;
     }
 
 }

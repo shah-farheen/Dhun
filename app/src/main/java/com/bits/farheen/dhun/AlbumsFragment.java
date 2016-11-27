@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.bits.farheen.dhun.adapters.AlbumListAdapter;
 import com.bits.farheen.dhun.models.AlbumModel;
+import com.bits.farheen.dhun.utils.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,37 +49,11 @@ public class AlbumsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
         ButterKnife.bind(this, view);
 
-        AlbumListAdapter albumListAdapter = new AlbumListAdapter(queryAlbums(), mContext);
+        AlbumListAdapter albumListAdapter = new AlbumListAdapter(Utility.queryAlbums(mContext, null, null), mContext);
         recyclerAlbums.setLayoutManager(new GridLayoutManager(mContext, 2));
         recyclerAlbums.setAdapter(albumListAdapter);
 
         return view;
-    }
-
-    public List<AlbumModel> queryAlbums(){
-        List<AlbumModel> albumList = new ArrayList<>();
-        String[] projectionColumns = {MediaStore.Audio.Albums.ALBUM_ART,
-                                      MediaStore.Audio.Albums.ALBUM_KEY,
-                                      MediaStore.Audio.Albums.ALBUM,
-                                      MediaStore.Audio.Albums.ARTIST,
-                                      MediaStore.Audio.Albums.NUMBER_OF_SONGS};
-
-        Cursor albumsCursor = mContext.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                projectionColumns, null, null, MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
-
-        if(albumsCursor != null){
-            while (albumsCursor.moveToNext()){
-                AlbumModel albumModel = new AlbumModel();
-                albumModel.setAlbumArt(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART)));
-                albumModel.setKey(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_KEY)));
-                albumModel.setName(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM)));
-                albumModel.setArtist(albumsCursor.getString(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST)));
-                albumModel.setNumSongs(albumsCursor.getInt(albumsCursor.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS)));
-                albumList.add(albumModel);
-            }
-            albumsCursor.close();
-        }
-        return albumList;
     }
 
 }
