@@ -13,6 +13,7 @@ import com.bits.farheen.dhun.models.ArtistModel;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,9 +27,9 @@ public class ArtistsListAdapter extends RecyclerView.Adapter<ArtistsListAdapter.
 
     private Context mContext;
     private LayoutInflater inflater;
-    private List<ArtistModel> artistList;
+    private ArrayList<ArtistModel> artistList;
 
-    public ArtistsListAdapter(List<ArtistModel> artistList, Context context){
+    public ArtistsListAdapter(ArrayList<ArtistModel> artistList, Context context){
         this.artistList = artistList;
         mContext = context;
         inflater = LayoutInflater.from(mContext);
@@ -58,6 +59,11 @@ public class ArtistsListAdapter extends RecyclerView.Adapter<ArtistsListAdapter.
     @Override
     public int getItemCount() {
         return artistList.size();
+    }
+
+    public void addData(ArrayList<ArtistModel> data){
+        artistList.addAll(data);
+        notifyDataSetChanged();
     }
 
     class ArtistHolder extends RecyclerView.ViewHolder{

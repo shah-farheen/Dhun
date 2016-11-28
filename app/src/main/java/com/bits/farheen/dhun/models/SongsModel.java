@@ -9,11 +9,21 @@ public class SongsModel {
     private String title;
     private String artist;
     private String album;
+    private int albumId;
     private long duration;
     private String dataUri;
+    private String songThumb;
 
     public SongsModel() {
 
+    }
+
+    public String getSongThumb() {
+        return songThumb;
+    }
+
+    public int getAlbumId() {
+        return albumId;
     }
 
     public String getDataUri() {
@@ -62,6 +72,14 @@ public class SongsModel {
 
     public void setDataUri(String dataUri) {
         this.dataUri = dataUri;
+    }
+
+    public void setAlbumId(int albumId) {
+        this.albumId = albumId;
+    }
+
+    public void setSongThumb(String songThumb) {
+        this.songThumb = songThumb;
     }
 
     @Override

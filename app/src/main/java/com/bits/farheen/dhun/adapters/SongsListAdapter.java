@@ -14,6 +14,7 @@ import com.bits.farheen.dhun.PlayMusicService;
 import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -57,6 +58,11 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         holder.textSongArtist.setText(currentSong.getArtist());
         holder.textSongAlbum.setText(currentSong.getAlbum());
 
+        Glide.with(mContext).load(currentSong.getSongThumb())
+                .fitCenter()
+                .placeholder(R.drawable.music)
+                .into(holder.imageSongThumb);
+
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,6 +77,21 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
     @Override
     public int getItemCount() {
         return songsList.size();
+    }
+
+    public void addData(ArrayList<SongsModel> data){
+        songsList.addAll(data);
+        notifyDataSetChanged();
+    }
+
+    public void updateSongInfo(long songId, String songThumb){
+        for(SongsModel songsModel : songsList){
+            if(songsModel.getSongId() == songId && songThumb != null){
+                songsModel.setSongThumb(songThumb);
+                notifyDataSetChanged();
+                break;
+            }
+        }
     }
 
     class SongViewHolder extends RecyclerView.ViewHolder{

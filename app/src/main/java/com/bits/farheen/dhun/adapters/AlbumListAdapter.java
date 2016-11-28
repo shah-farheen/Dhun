@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,9 +28,9 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Albu
 
     private Context mContext;
     private LayoutInflater inflater;
-    private List<AlbumModel> albumList;
+    private ArrayList<AlbumModel> albumList;
 
-    public AlbumListAdapter(List<AlbumModel> albumList, Context context){
+    public AlbumListAdapter(ArrayList<AlbumModel> albumList, Context context){
         this.albumList = albumList;
         mContext = context;
         inflater = LayoutInflater.from(mContext);
@@ -52,7 +53,7 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Albu
         Glide.with(mContext).load(currentAlbum.getAlbumArt())
                 .fitCenter()
                 .placeholder(R.drawable.music)
-                .into(holder.imageArtistThumb);
+                .into(holder.imageAlbumThumb);
 
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,9 +68,14 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.Albu
         return albumList.size();
     }
 
+    public void addData(ArrayList<AlbumModel> data){
+        albumList.addAll(data);
+        notifyDataSetChanged();
+    }
+
     class AlbumHolder extends RecyclerView.ViewHolder{
 
-        @BindView(R.id.image_album_thumb) ImageView imageArtistThumb;
+        @BindView(R.id.image_album_thumb) ImageView imageAlbumThumb;
         @BindView(R.id.text_album_name) TextView textAlbumName;
         @BindView(R.id.text_album_artist) TextView textAlbumArtist;
         @BindView(R.id.text_num_songs) TextView textNumSongs;
