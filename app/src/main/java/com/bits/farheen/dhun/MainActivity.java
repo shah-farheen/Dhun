@@ -19,8 +19,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bits.farheen.dhun.events.MusicQueue;
 import com.bits.farheen.dhun.events.PauseMusic;
+import com.bits.farheen.dhun.events.PlayStatusChange;
+import com.bits.farheen.dhun.events.PositionChange;
+import com.bits.farheen.dhun.events.QueueChange;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.ArtistModel;
 import com.bits.farheen.dhun.models.SongsModel;
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences dataFile;
     private FragmentManager fragmentManager;
     private static final String TAG = "MainActivity";
-    private int lastPlayedPosition;
+    private int currentlyPlayingPosition;
     private ArrayList<SongsModel> currentQueue;
     private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
@@ -82,6 +84,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        currentQueue = gson.fromJson(dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null), songListType);
+        currentlyPlayingPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
+        if(currentQueue == null){
+            bottomView.setVisibility(View.GONE);
+        }
+        else {
+            bottomView.setVisibility(View.VISIBLE);
+            updateBottomView(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false));
+        }
         EventBus.getDefault().register(this);
     }
 
@@ -116,36 +127,55 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     Intent playMusicIntent = new Intent(mContext, PlayMusicService.class)
-                            .putExtra(Constants.CURRENT_MUSIC_QUEUE, dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null))
-                            .putExtra(Constants.POSITION_TO_PLAY, dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0));
+                            .putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType))
+                            .putExtra(Constants.POSITION_TO_PLAY, currentlyPlayingPosition)
+                            .putExtra(Constants.PLAYBACK_TYPE, Constants.PLAYBACK_RESUME);
                     startService(playMusicIntent);
                     imagePlayPause.setImageResource(R.drawable.pause);
                 }
             }
         });
+
+        bottomView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent nowPlayingIntent = new Intent(mContext, NowPlayingActivity.class);
+                startActivity(nowPlayingIntent);
+            }
+        });
     }
 
     void initViews(){
-        currentQueue = gson.fromJson(dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null), songListType);
-        lastPlayedPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
-        if(currentQueue == null){
-            bottomView.setVisibility(View.GONE);
+
+    }
+
+    public void updateBottomView(boolean isMusicPlaying){
+        textSongName.setText(currentQueue.get(currentlyPlayingPosition).getTitle());
+        textSongArtist.setText(currentQueue.get(currentlyPlayingPosition).getArtist());
+        if(isMusicPlaying){
+            imagePlayPause.setImageResource(R.drawable.pause);
         }
         else {
-            textSongName.setText(currentQueue.get(lastPlayedPosition).getTitle());
-            textSongArtist.setText(currentQueue.get(lastPlayedPosition).getArtist());
-            if(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false)){
-                imagePlayPause.setImageResource(R.drawable.pause);
-            }
-            else {
-                imagePlayPause.setImageResource(R.drawable.play);
-            }
+            imagePlayPause.setImageResource(R.drawable.play);
         }
     }
 
     @Subscribe
-    public void getUpdatedQueue(MusicQueue musicQueue){
-        currentQueue = musicQueue.getQueue();
+    public void onQueueChange(QueueChange queueChange){
+        currentQueue = queueChange.getQueue();
+        currentlyPlayingPosition = queueChange.getPositionToPlay();
+        updateBottomView(true);
+    }
+
+    @Subscribe
+    public void onPositionChange(PositionChange positionChange){
+        currentlyPlayingPosition = positionChange.getPosition();
+        updateBottomView(true);
+    }
+
+    @Subscribe
+    public void onPlayStatusChange(PlayStatusChange playStatusChange){
+        updateBottomView(playStatusChange.isPlaying());
     }
 
     @Subscribe

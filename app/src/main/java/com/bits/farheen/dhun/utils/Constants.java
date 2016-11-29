@@ -17,6 +17,8 @@ public class Constants {
     public static final String ARTIST_KEY = "ARTIST_KEY";
     public static final String ARTIST_NAME = "ARTIST_NAME";
 
+    public static final String SONG_THUMB_PATH = "SONG_THUMB_PATH";
+
     public static final String IS_MUSIC_PLAYING = "IS_MUSIC_PLAYING";
     public static final String POSITION_TO_PLAY = "POSITION_TO_PLAY";
     public static final String CURRENT_MUSIC_QUEUE = "CURRENT_MUSIC_QUEUE";

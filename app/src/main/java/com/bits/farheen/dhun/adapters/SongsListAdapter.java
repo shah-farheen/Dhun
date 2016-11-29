@@ -11,14 +11,11 @@ import android.widget.TextView;
 
 import com.bits.farheen.dhun.PlayMusicService;
 import com.bits.farheen.dhun.R;
-import com.bits.farheen.dhun.events.MusicQueue;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -67,7 +64,6 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventBus.getDefault().post(new MusicQueue(songsList));
                 Intent playMusicIntent = new Intent(mContext, PlayMusicService.class)
                         .putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(songsList, songListType))
                         .putExtra(Constants.POSITION_TO_PLAY, holder.getAdapterPosition())

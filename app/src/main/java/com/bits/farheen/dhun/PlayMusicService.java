@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,9 +17,13 @@ import android.os.PowerManager;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
 
 import com.bits.farheen.dhun.events.PauseMusic;
 import com.bits.farheen.dhun.events.PlayMusic;
+import com.bits.farheen.dhun.events.PlayStatusChange;
+import com.bits.farheen.dhun.events.PositionChange;
+import com.bits.farheen.dhun.events.QueueChange;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
 import com.google.gson.Gson;
@@ -96,6 +99,8 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
                     currentQueue = songQueue;
                     currentPlayingPosition = positionToPlay;
                     startPlayingMusic(currentQueue.get(currentPlayingPosition).getDataUri());
+                    EventBus.getDefault().post(new QueueChange(currentPlayingPosition, currentQueue));
+                    dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
                     break;
             }
         }
@@ -103,6 +108,8 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
             currentQueue = songQueue;
             currentPlayingPosition = positionToPlay;
             startPlayingMusic(currentQueue.get(currentPlayingPosition).getDataUri());
+            EventBus.getDefault().post(new QueueChange(currentPlayingPosition, currentQueue));
+            dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
         }
 
         isAlreadyRunning = true;
@@ -120,17 +127,20 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         mediaPlayer.stop();
         mediaPlayer.release();
         EventBus.getDefault().unregister(this);
+
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(Constants.FOREGROUND_SERVICE_NOTIFICATION_ID);
-        dataFile.edit().putInt(Constants.LAST_PLAYED_POSITION, currentPlayingPosition).apply();
-        dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
         super.onDestroy();
     }
 
     private Notification getNotification(){
+        RemoteViews notificationLayout = new RemoteViews(getPackageName(), R.layout.now_playing_notification);
+        notificationLayout.setTextViewText(R.id.text_song_name, currentQueue.get(currentPlayingPosition).getTitle());
+        notificationLayout.setImageViewUri(R.id.image_song_thumb, Uri.parse(currentQueue.get(currentPlayingPosition).getSongThumb()));
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.play)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+                .setContent(notificationLayout);
         return builder.build();
     }
 
@@ -158,6 +168,7 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
                 mediaPlayer.start();
                 startForeground(Constants.FOREGROUND_SERVICE_NOTIFICATION_ID, getNotification());
                 dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, true).apply();
+                EventBus.getDefault().post(new PlayStatusChange(true));
             }
         });
     }
@@ -167,10 +178,13 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         mediaPlayer.pause();
         stopForeground(false);
         dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, false).apply();
+        EventBus.getDefault().post(new PlayStatusChange(false));
     }
 
     public void changePosition(int position){
         startPlayingMusic(currentQueue.get(position).getDataUri());
+        EventBus.getDefault().post(new PositionChange(position));
+        dataFile.edit().putInt(Constants.LAST_PLAYED_POSITION, position).apply();
     }
 
     @Override
@@ -182,6 +196,8 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         else {
             currentPlayingPosition++;
             startPlayingMusic(currentQueue.get(currentPlayingPosition).getDataUri());
+            EventBus.getDefault().post(new PositionChange(currentPlayingPosition));
+            dataFile.edit().putInt(Constants.LAST_PLAYED_POSITION, currentPlayingPosition).apply();
         }
     }
 
