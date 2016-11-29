@@ -2,6 +2,8 @@ package com.bits.farheen.dhun;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,14 +19,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bits.farheen.dhun.events.MusicQueue;
 import com.bits.farheen.dhun.events.PauseMusic;
-import com.bits.farheen.dhun.events.PlayMusic;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.ArtistModel;
+import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,10 +44,16 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.text_song_artist) TextView textSongArtist;
     @BindView(R.id.image_play_pause) ImageView imagePlayPause;
     @BindView(R.id.frag_container) FrameLayout fragContainer;
+    @BindView(R.id.bottom_view) View bottomView;
 
-    private FragmentManager fragmentManager;
+    private Gson gson;
+    private Context mContext;
     private SharedPreferences dataFile;
+    private FragmentManager fragmentManager;
     private static final String TAG = "MainActivity";
+    private int lastPlayedPosition;
+    private ArrayList<SongsModel> currentQueue;
+    private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
     @SuppressLint("InlinedApi")
     @Override
@@ -47,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mContext = this;
+        gson = new Gson();
         setSupportActionBar(toolbar);
         fragmentManager = getSupportFragmentManager();
         dataFile = getSharedPreferences(Constants.DATA_FILE, MODE_PRIVATE);
@@ -72,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         EventBus.getDefault().unregister(this);
+        dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
         super.onStop();
     }
 
@@ -98,7 +115,10 @@ public class MainActivity extends AppCompatActivity {
                     imagePlayPause.setImageResource(R.drawable.play);
                 }
                 else {
-                    EventBus.getDefault().post(new PlayMusic());
+                    Intent playMusicIntent = new Intent(mContext, PlayMusicService.class)
+                            .putExtra(Constants.CURRENT_MUSIC_QUEUE, dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null))
+                            .putExtra(Constants.POSITION_TO_PLAY, dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0));
+                    startService(playMusicIntent);
                     imagePlayPause.setImageResource(R.drawable.pause);
                 }
             }
@@ -106,16 +126,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void initViews(){
-        fragmentManager.beginTransaction()
-                .add(R.id.frag_container, new TabsFragment())
-                .commit();
-
-        if(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false)){
-            imagePlayPause.setImageResource(R.drawable.pause);
+        currentQueue = gson.fromJson(dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null), songListType);
+        lastPlayedPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
+        if(currentQueue == null){
+            bottomView.setVisibility(View.GONE);
         }
         else {
-            imagePlayPause.setImageResource(R.drawable.play);
+            textSongName.setText(currentQueue.get(lastPlayedPosition).getTitle());
+            textSongArtist.setText(currentQueue.get(lastPlayedPosition).getArtist());
+            if(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false)){
+                imagePlayPause.setImageResource(R.drawable.pause);
+            }
+            else {
+                imagePlayPause.setImageResource(R.drawable.play);
+            }
         }
+    }
+
+    @Subscribe
+    public void getUpdatedQueue(MusicQueue musicQueue){
+        currentQueue = musicQueue.getQueue();
     }
 
     @Subscribe
@@ -146,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
         artistDetailsFragment.setArguments(artistBundle);
 
         fragmentManager.beginTransaction()
-                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .add(R.id.frag_container, artistDetailsFragment)
                 .addToBackStack(null)
                 .commit();

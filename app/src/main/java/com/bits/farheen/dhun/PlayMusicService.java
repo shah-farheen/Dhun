@@ -1,6 +1,7 @@
 package com.bits.farheen.dhun;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,20 +14,24 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.bits.farheen.dhun.events.PauseMusic;
 import com.bits.farheen.dhun.events.PlayMusic;
+import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 /**
  * Created by farheen on 11/18/16
@@ -36,9 +41,14 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
 
     private Gson gson;
     private MediaPlayer mediaPlayer;
-    private ServiceHandler mServiceHandler;
     private SharedPreferences dataFile;
+    private ServiceHandler mServiceHandler;
     private static final String TAG = "PlayMusicService";
+    private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
+
+    private boolean isAlreadyRunning;
+    private int currentPlayingPosition;
+    private ArrayList<SongsModel> currentQueue;
 
     private class ServiceHandler extends Handler{
         ServiceHandler(Looper looper){
@@ -54,8 +64,10 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
     @Override
     public void onCreate() {
         gson = new Gson();
+        isAlreadyRunning = false;
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
         mediaPlayer.setOnCompletionListener(this);
 
         HandlerThread thread = new HandlerThread("PlayMusicThread", Process.THREAD_PRIORITY_AUDIO);
@@ -67,13 +79,33 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
     }
 
     @Override
-    public int onStartCommand(final Intent intent, int flags, int startId) {
-        mServiceHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                startPlayingMusic(intent.getStringExtra(Constants.SONG_PATH));
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        ArrayList<SongsModel> songQueue =
+                gson.fromJson(intent.getStringExtra(Constants.CURRENT_MUSIC_QUEUE), songListType);
+        int positionToPlay = intent.getIntExtra(Constants.POSITION_TO_PLAY, 0);
+
+        if(isAlreadyRunning){
+            switch (intent.getIntExtra(Constants.PLAYBACK_TYPE, Constants.PLAYBACK_CHANGE_PLAYLIST)){
+                case Constants.PLAYBACK_RESUME :
+                    playMusic(new PlayMusic());
+                    break;
+                case Constants.PLAYBACK_CHANGE_POSITION :
+                    changePosition(positionToPlay);
+                    break;
+                case Constants.PLAYBACK_CHANGE_PLAYLIST :
+                    currentQueue = songQueue;
+                    currentPlayingPosition = positionToPlay;
+                    startPlayingMusic(currentQueue.get(currentPlayingPosition).getDataUri());
+                    break;
             }
-        });
+        }
+        else {
+            currentQueue = songQueue;
+            currentPlayingPosition = positionToPlay;
+            startPlayingMusic(currentQueue.get(currentPlayingPosition).getDataUri());
+        }
+
+        isAlreadyRunning = true;
         return START_NOT_STICKY;
     }
 
@@ -88,6 +120,10 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         mediaPlayer.stop();
         mediaPlayer.release();
         EventBus.getDefault().unregister(this);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(Constants.FOREGROUND_SERVICE_NOTIFICATION_ID);
+        dataFile.edit().putInt(Constants.LAST_PLAYED_POSITION, currentPlayingPosition).apply();
+        dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
         super.onDestroy();
     }
 
@@ -98,23 +134,32 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         return builder.build();
     }
 
-    private void startPlayingMusic(String songPath){
-        Uri songUri = Uri.parse(songPath);
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(this, songUri);
-            mediaPlayer.prepare();
-            playMusic(new PlayMusic());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void startPlayingMusic(final String songPath){
+        mServiceHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mediaPlayer.reset();
+                    mediaPlayer.setDataSource(songPath);
+                    mediaPlayer.prepare();
+                    playMusic(new PlayMusic());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Subscribe
     public void playMusic(PlayMusic playMusic){
-        mediaPlayer.start();
-        startForeground(Constants.FOREGROUND_SERVICE_NOTIFICATION_ID, getNotification());
-        dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, true).apply();
+        mServiceHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mediaPlayer.start();
+                startForeground(Constants.FOREGROUND_SERVICE_NOTIFICATION_ID, getNotification());
+                dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, true).apply();
+            }
+        });
     }
 
     @Subscribe
@@ -124,10 +169,20 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, false).apply();
     }
 
+    public void changePosition(int position){
+        startPlayingMusic(currentQueue.get(position).getDataUri());
+    }
+
     @Override
     public void onCompletion(MediaPlayer mp) {
-        dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, false).apply();
-        stopSelf();
+        if(currentPlayingPosition == currentQueue.size()-1){
+            dataFile.edit().putBoolean(Constants.IS_MUSIC_PLAYING, false).apply();
+            stopSelf();
+        }
+        else {
+            currentPlayingPosition++;
+            startPlayingMusic(currentQueue.get(currentPlayingPosition).getDataUri());
+        }
     }
 
 }

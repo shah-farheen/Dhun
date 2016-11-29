@@ -54,6 +54,14 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_view"
         android:layout_below="@id/toolbar_main_activity">
+
+        <fragment
+            android:id="@+id/tabs_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_tabs"
+            android:name="com.bits.farheen.dhun.TabsFragment"/>
+
     </FrameLayout>
 
 </RelativeLayout>

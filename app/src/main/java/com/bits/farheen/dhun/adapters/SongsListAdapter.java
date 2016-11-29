@@ -2,7 +2,6 @@ package com.bits.farheen.dhun.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,11 +11,14 @@ import android.widget.TextView;
 
 import com.bits.farheen.dhun.PlayMusicService;
 import com.bits.farheen.dhun.R;
+import com.bits.farheen.dhun.events.MusicQueue;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
     private Context mContext;
     private LayoutInflater inflater;
     private ArrayList<SongsModel> songsList;
-    private SharedPreferences dataFile;
+    private static final String TAG = "SongsListAdapter";
     private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
     public SongsListAdapter(ArrayList<SongsModel> songsList, Context context){
@@ -42,7 +44,6 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         gson = new Gson();
         inflater = LayoutInflater.from(mContext);
         this.songsList = songsList;
-        dataFile = mContext.getSharedPreferences(Constants.DATA_FILE, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
     }
 
     @Override
-    public void onBindViewHolder(SongViewHolder holder, int position) {
+    public void onBindViewHolder(final SongViewHolder holder, int position) {
         SongsModel currentSong = songsList.get(position);
         holder.textSongTitle.setText(currentSong.getTitle());
         holder.textSongArtist.setText(currentSong.getArtist());
@@ -66,9 +67,11 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(songsList, songListType)).apply();
-                Intent playMusicIntent = new Intent(mContext, PlayMusicService.class);
-                playMusicIntent.putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(songsList, songListType));
+                EventBus.getDefault().post(new MusicQueue(songsList));
+                Intent playMusicIntent = new Intent(mContext, PlayMusicService.class)
+                        .putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(songsList, songListType))
+                        .putExtra(Constants.POSITION_TO_PLAY, holder.getAdapterPosition())
+                        .putExtra(Constants.PLAYBACK_TYPE, Constants.PLAYBACK_CHANGE_PLAYLIST);
                 mContext.startService(playMusicIntent);
             }
         });
@@ -85,11 +88,14 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
     }
 
     public void updateSongInfo(long songId, String songThumb){
-        for(SongsModel songsModel : songsList){
-            if(songsModel.getSongId() == songId && songThumb != null){
-                songsModel.setSongThumb(songThumb);
-                notifyDataSetChanged();
-                break;
+        if(songThumb != null){
+            for(int i=0; i<songsList.size(); i++){
+                SongsModel songsModel = songsList.get(i);
+                if(songsModel.getSongId() == songId){
+                    songsModel.setSongThumb(songThumb);
+                    notifyItemChanged(i, songsModel);
+                    break;
+                }
             }
         }
     }
