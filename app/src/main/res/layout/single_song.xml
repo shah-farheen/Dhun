@@ -55,4 +55,16 @@
         android:layout_marginBottom="5dp"
         android:text="Ghazals of Jagjit Singh"/>
 
+    <ImageView
+        android:id="@+id/image_popup_menu"
+        android:layout_width="20dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        android:src="@drawable/dots"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        tools:ignore="ContentDescription" />
+
 </RelativeLayout>

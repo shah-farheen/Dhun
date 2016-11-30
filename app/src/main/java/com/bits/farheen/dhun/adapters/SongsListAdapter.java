@@ -2,6 +2,7 @@ package com.bits.farheen.dhun.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,6 +72,15 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
                 mContext.startService(playMusicIntent);
             }
         });
+
+        holder.imagePopupMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(mContext, v);
+                popupMenu.getMenuInflater().inflate(R.menu.single_song_menu, popupMenu.getMenu());
+                popupMenu.show();
+            }
+        });
     }
 
     @Override
@@ -101,6 +111,7 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         @BindView(R.id.text_song_title) TextView textSongTitle;
         @BindView(R.id.text_song_artist) TextView textSongArtist;
         @BindView(R.id.text_song_album) TextView textSongAlbum;
+        @BindView(R.id.image_popup_menu) ImageView imagePopupMenu;
         @BindView(R.id.root_view) View rootView;
 
         SongViewHolder(View itemView) {

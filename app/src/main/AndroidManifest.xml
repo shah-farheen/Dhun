@@ -23,7 +23,7 @@
         <service android:name=".PlayMusicService" />
 
         <activity android:name=".NowPlayingActivity" />
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity"/>
     </application>
 
 </manifest>
