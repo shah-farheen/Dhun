@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bits.farheen.dhun">
 
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -21,7 +22,8 @@
 
         <service android:name=".PlayMusicService" />
 
-        <activity android:name=".NowPlayingActivity"/>
+        <activity android:name=".NowPlayingActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

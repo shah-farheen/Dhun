@@ -6,6 +6,7 @@ package com.bits.farheen.dhun.utils;
 
 public class Constants {
     public static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
+    public static final int CHANGE_RINGTONE_REQUEST_CODE = 2;
 
     public static final int FOREGROUND_SERVICE_NOTIFICATION_ID = 1;
 
