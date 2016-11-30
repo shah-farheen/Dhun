@@ -76,6 +76,7 @@ public class ArtistDetailsFragment extends Fragment implements MediaQuery.QueryC
         recyclerSongs.setAdapter(songsListAdapter);
         recyclerAlbums.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         recyclerAlbums.setAdapter(albumListAdapter);
+        recyclerSongs.setNestedScrollingEnabled(false);
 
         return view;
     }
