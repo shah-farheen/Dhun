@@ -1,10 +1,14 @@
 package com.bits.farheen.dhun.adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -52,7 +56,7 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
 
     @Override
     public void onBindViewHolder(final SongViewHolder holder, int position) {
-        SongsModel currentSong = songsList.get(position);
+        final SongsModel currentSong = songsList.get(position);
         holder.textSongTitle.setText(currentSong.getTitle());
         holder.textSongArtist.setText(currentSong.getArtist());
         holder.textSongAlbum.setText(currentSong.getAlbum());
@@ -78,6 +82,20 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
             public void onClick(View v) {
                 PopupMenu popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.single_song_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.action_set_ringtone :
+                                RingtoneManager.setActualDefaultRingtoneUri(mContext,
+                                        RingtoneManager.TYPE_RINGTONE,
+                                        ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currentSong.getSongId()));
+                                return true;
+                            default :
+                                return true;
+                        }
+                    }
+                });
                 popupMenu.show();
             }
         });

@@ -4,10 +4,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.bits.farheen.dhun.adapters.NowPlayingThumbAdapter;
+import com.bits.farheen.dhun.adapters.SongsListAdapter;
 import com.bits.farheen.dhun.events.PlayStatusChange;
 import com.bits.farheen.dhun.events.PositionChange;
 import com.bits.farheen.dhun.events.QueueChange;
@@ -30,11 +33,14 @@ public class NowPlayingActivity extends AppCompatActivity {
     private Gson gson;
     private SharedPreferences dataFile;
     private int currentlyPlayingPosition;
+    private SongsListAdapter songsListAdapter;
     private ArrayList<SongsModel> currentQueue;
     private NowPlayingThumbAdapter nowPlayingThumbAdapter;
     private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
     @BindView(R.id.view_pager_song_thumbs) ViewPager viewPagerSongThumbs;
+    @BindView(R.id.image_show_queue) ImageView imageShowQueue;
+    @BindView(R.id.recycler_song_queue) RecyclerView recyclerSongQueue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +52,21 @@ public class NowPlayingActivity extends AppCompatActivity {
         nowPlayingThumbAdapter =
                 new NowPlayingThumbAdapter(getSupportFragmentManager(), new ArrayList<SongsModel>());
         viewPagerSongThumbs.setAdapter(nowPlayingThumbAdapter);
+
+        songsListAdapter = new SongsListAdapter(new ArrayList<SongsModel>(), this);
+        recyclerSongQueue.setLayoutManager(new LinearLayoutManager(this));
+        recyclerSongQueue.setAdapter(songsListAdapter);
+
+        initListeners();
+    }
+
+    void initListeners(){
+        imageShowQueue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recyclerSongQueue.setY(0.0f);
+            }
+        });
     }
 
     @Override
@@ -55,6 +76,7 @@ public class NowPlayingActivity extends AppCompatActivity {
         currentlyPlayingPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
         if(currentQueue != null){
             nowPlayingThumbAdapter.addData(currentQueue);
+            songsListAdapter.addData(currentQueue);
         }
         EventBus.getDefault().register(this);
     }

@@ -32,9 +32,9 @@ public class SettingsActivity extends AppCompatActivity {
             if(!Settings.System.canWrite(this)){
                 startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
             }
-
-            initListeners();
         }
+
+        initListeners();
     }
 
     void initListeners(){

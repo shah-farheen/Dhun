@@ -7,6 +7,10 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_songs"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:scrollbarSize="5dp"
+        android:scrollbars="vertical"
+        android:scrollbarTrackVertical="@color/colorPrimary"
+        android:scrollbarThumbVertical="@color/colorPrimaryDark"/>
 
 </FrameLayout>
