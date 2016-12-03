@@ -15,7 +15,9 @@
     <TextView
         android:id="@+id/text_song_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:maxLines="1"
+        android:gravity="center"
         android:textSize="16sp"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/image_song_thumb"
@@ -24,9 +26,10 @@
     <LinearLayout
         android:id="@+id/layout_control_music"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:orientation="horizontal"
         android:padding="5dp"
+        android:gravity="center"
         android:layout_below="@id/text_song_name"
         android:layout_toRightOf="@id/image_song_thumb">
 

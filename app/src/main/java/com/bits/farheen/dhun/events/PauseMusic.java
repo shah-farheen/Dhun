@@ -5,4 +5,5 @@ package com.bits.farheen.dhun.events;
  */
 
 public class PauseMusic {
+
 }

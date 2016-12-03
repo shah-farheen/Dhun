@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences dataFile;
     private FragmentManager fragmentManager;
     private static final String TAG = "MainActivity";
-    private int currentlyPlayingPosition;
+
+    private int currentPlayingPosition;
     private ArrayList<SongsModel> currentQueue;
     private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         currentQueue = gson.fromJson(dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null), songListType);
-        currentlyPlayingPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
+        currentPlayingPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
         if(currentQueue == null){
             bottomView.setVisibility(View.GONE);
         }
@@ -120,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         EventBus.getDefault().unregister(this);
-        dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
         super.onStop();
     }
 
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     Intent playMusicIntent = new Intent(mContext, PlayMusicService.class)
                             .putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType))
-                            .putExtra(Constants.POSITION_TO_PLAY, currentlyPlayingPosition)
+                            .putExtra(Constants.POSITION_TO_PLAY, currentPlayingPosition)
                             .putExtra(Constants.PLAYBACK_TYPE, Constants.PLAYBACK_RESUME);
                     startService(playMusicIntent);
                     imagePlayPause.setImageResource(R.drawable.pause);
@@ -171,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateBottomView(boolean isMusicPlaying){
-        textSongName.setText(currentQueue.get(currentlyPlayingPosition).getTitle());
-        textSongArtist.setText(currentQueue.get(currentlyPlayingPosition).getArtist());
+        textSongName.setText(currentQueue.get(currentPlayingPosition).getTitle());
+        textSongArtist.setText(currentQueue.get(currentPlayingPosition).getArtist());
         if(isMusicPlaying){
             imagePlayPause.setImageResource(R.drawable.pause);
         }
@@ -184,13 +184,13 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onQueueChange(QueueChange queueChange){
         currentQueue = queueChange.getQueue();
-        currentlyPlayingPosition = queueChange.getPositionToPlay();
+        currentPlayingPosition = queueChange.getPositionToPlay();
         updateBottomView(true);
     }
 
     @Subscribe
     public void onPositionChange(PositionChange positionChange){
-        currentlyPlayingPosition = positionChange.getPosition();
+        currentPlayingPosition = positionChange.getPosition();
         updateBottomView(true);
     }
 

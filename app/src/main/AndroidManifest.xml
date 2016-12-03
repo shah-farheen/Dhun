@@ -24,6 +24,13 @@
 
         <activity android:name=".NowPlayingActivity" />
         <activity android:name=".SettingsActivity"/>
+
+        <receiver android:name=".utils.MusicIntentReceiver">
+            <intent-filter>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

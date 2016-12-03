@@ -1,5 +1,7 @@
 package com.bits.farheen.dhun;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -11,6 +13,7 @@ import android.widget.ImageView;
 
 import com.bits.farheen.dhun.adapters.NowPlayingThumbAdapter;
 import com.bits.farheen.dhun.adapters.SongsListAdapter;
+import com.bits.farheen.dhun.events.PauseMusic;
 import com.bits.farheen.dhun.events.PlayStatusChange;
 import com.bits.farheen.dhun.events.PositionChange;
 import com.bits.farheen.dhun.events.QueueChange;
@@ -30,23 +33,29 @@ import butterknife.ButterKnife;
 
 public class NowPlayingActivity extends AppCompatActivity {
 
+    @BindView(R.id.image_show_queue) ImageView imageShowQueue;
+    @BindView(R.id.image_play_pause) ImageView imagePlayPause;
+    @BindView(R.id.image_previous) ImageView imagePrevious;
+    @BindView(R.id.image_next) ImageView imageNext;
+    @BindView(R.id.view_pager_song_thumbs) ViewPager viewPagerSongThumbs;
+    @BindView(R.id.recycler_song_queue) RecyclerView recyclerSongQueue;
+
     private Gson gson;
+    private Context mContext;
     private SharedPreferences dataFile;
-    private int currentlyPlayingPosition;
+    private int currentPlayingPosition;
     private SongsListAdapter songsListAdapter;
     private ArrayList<SongsModel> currentQueue;
     private NowPlayingThumbAdapter nowPlayingThumbAdapter;
     private Type songListType = new TypeToken<ArrayList<SongsModel>>(){}.getType();
 
-    @BindView(R.id.view_pager_song_thumbs) ViewPager viewPagerSongThumbs;
-    @BindView(R.id.image_show_queue) ImageView imageShowQueue;
-    @BindView(R.id.recycler_song_queue) RecyclerView recyclerSongQueue;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
         ButterKnife.bind(this);
         gson = new Gson();
+        mContext = this;
         dataFile = getSharedPreferences(Constants.DATA_FILE, MODE_PRIVATE);
 
         nowPlayingThumbAdapter =
@@ -56,11 +65,31 @@ public class NowPlayingActivity extends AppCompatActivity {
         songsListAdapter = new SongsListAdapter(new ArrayList<SongsModel>(), this);
         recyclerSongQueue.setLayoutManager(new LinearLayoutManager(this));
         recyclerSongQueue.setAdapter(songsListAdapter);
+        recyclerSongQueue.setNestedScrollingEnabled(false);
 
         initListeners();
     }
 
     void initListeners(){
+        imagePlayPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // If music is playing then pause it
+                if(dataFile.getBoolean(Constants.IS_MUSIC_PLAYING, false)){
+                    EventBus.getDefault().post(new PauseMusic());
+                    imagePlayPause.setImageResource(R.drawable.play);
+                }
+                else {
+                    Intent playMusicIntent = new Intent(mContext, PlayMusicService.class)
+                            .putExtra(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType))
+                            .putExtra(Constants.POSITION_TO_PLAY, currentPlayingPosition)
+                            .putExtra(Constants.PLAYBACK_TYPE, Constants.PLAYBACK_RESUME);
+                    startService(playMusicIntent);
+                    imagePlayPause.setImageResource(R.drawable.pause);
+                }
+            }
+        });
+
         imageShowQueue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +102,7 @@ public class NowPlayingActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         currentQueue = gson.fromJson(dataFile.getString(Constants.CURRENT_MUSIC_QUEUE, null), songListType);
-        currentlyPlayingPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
+        currentPlayingPosition = dataFile.getInt(Constants.LAST_PLAYED_POSITION, 0);
         if(currentQueue != null){
             nowPlayingThumbAdapter.addData(currentQueue);
             songsListAdapter.addData(currentQueue);
@@ -84,23 +113,31 @@ public class NowPlayingActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         EventBus.getDefault().unregister(this);
-        dataFile.edit().putString(Constants.CURRENT_MUSIC_QUEUE, gson.toJson(currentQueue, songListType)).apply();
         super.onStop();
     }
 
     @Subscribe
     public void onQueueChange(QueueChange queueChange){
         currentQueue = queueChange.getQueue();
-        currentlyPlayingPosition = queueChange.getPositionToPlay();
+        currentPlayingPosition = queueChange.getPositionToPlay();
+        nowPlayingThumbAdapter.replaceData(currentQueue);
+        songsListAdapter.replaceData(currentQueue);
+        viewPagerSongThumbs.setCurrentItem(currentPlayingPosition, false);
     }
 
     @Subscribe
     public void onPositionChange(PositionChange positionChange){
-        currentlyPlayingPosition = positionChange.getPosition();
+        currentPlayingPosition = positionChange.getPosition();
+        viewPagerSongThumbs.setCurrentItem(currentPlayingPosition, false);
     }
 
     @Subscribe
     public void onPlayStatusChange(PlayStatusChange playStatusChange){
-
+        if(playStatusChange.isPlaying()){
+            imagePlayPause.setImageResource(R.drawable.pause);
+        }
+        else {
+            imagePlayPause.setImageResource(R.drawable.play);
+        }
     }
 }

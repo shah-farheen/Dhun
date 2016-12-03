@@ -111,6 +111,12 @@ public class SongsListAdapter extends RecyclerView.Adapter<SongsListAdapter.Song
         notifyDataSetChanged();
     }
 
+    public void replaceData(ArrayList<SongsModel> data){
+        songsList.clear();
+        songsList.addAll(data);
+        notifyDataSetChanged();
+    }
+
     public void updateSongInfo(long songId, String songThumb){
         if(songThumb != null){
             for(int i=0; i<songsList.size(); i++){

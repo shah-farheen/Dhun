@@ -43,4 +43,10 @@ public class NowPlayingThumbAdapter extends FragmentStatePagerAdapter{
         nowPlayingList.addAll(data);
         notifyDataSetChanged();
     }
+
+    public void replaceData(ArrayList<SongsModel> data){
+        nowPlayingList.clear();
+        nowPlayingList.addAll(data);
+        notifyDataSetChanged();
+    }
 }
