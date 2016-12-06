@@ -3,7 +3,7 @@
     package="com.bits.farheen.dhun">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,14 +20,17 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".MainActivity">
+        </activity>
+
         <service android:name=".PlayMusicService" />
 
         <activity android:name=".NowPlayingActivity" />
-        <activity android:name=".SettingsActivity"/>
+        <activity android:name=".SettingsActivity" />
 
         <receiver android:name=".utils.MusicIntentReceiver">
             <intent-filter>
-                <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
             </intent-filter>
         </receiver>
 
