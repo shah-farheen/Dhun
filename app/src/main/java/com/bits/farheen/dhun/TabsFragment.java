@@ -5,12 +5,17 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bits.farheen.dhun.adapters.ViewPagerAdapter;
+import com.bits.farheen.dhun.music.albums.AlbumsFragment;
+import com.bits.farheen.dhun.music.artists.ArtistsFragment;
+import com.bits.farheen.dhun.misc.PlaylistsFragment;
+import com.bits.farheen.dhun.music.songs.SongsFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +52,41 @@ public class TabsFragment extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
 
         return view;
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        private String[] pagerTitles = {"Artists", "Albums", "Songs", "PlayLists"};
+
+        ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position){
+                case 0 :
+                    return new ArtistsFragment();
+                case 1 :
+                    return new AlbumsFragment();
+                case 2 :
+                    return new SongsFragment();
+                case 3 :
+                    return new PlaylistsFragment();
+                default :
+                    return null;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return pagerTitles.length;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return pagerTitles[position];
+        }
     }
 
 }

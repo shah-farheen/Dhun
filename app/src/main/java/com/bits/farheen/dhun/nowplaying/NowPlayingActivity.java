@@ -1,9 +1,12 @@
-package com.bits.farheen.dhun;
+package com.bits.farheen.dhun.nowplaying;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,13 +14,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bits.farheen.dhun.adapters.NowPlayingThumbAdapter;
-import com.bits.farheen.dhun.adapters.SongsListAdapter;
+import com.bits.farheen.dhun.PlayMusicService;
+import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.events.PauseMusic;
 import com.bits.farheen.dhun.events.PlayStatusChange;
 import com.bits.farheen.dhun.events.PositionChange;
 import com.bits.farheen.dhun.events.QueueChange;
 import com.bits.farheen.dhun.models.SongsModel;
+import com.bits.farheen.dhun.music.songs.SongsListAdapter;
 import com.bits.farheen.dhun.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -138,6 +142,42 @@ public class NowPlayingActivity extends AppCompatActivity {
         }
         else {
             imagePlayPause.setImageResource(R.drawable.play);
+        }
+    }
+
+    private class NowPlayingThumbAdapter extends FragmentStatePagerAdapter {
+
+        private Bundle dataBundle;
+        private ArrayList<SongsModel> nowPlayingList;
+
+        NowPlayingThumbAdapter(FragmentManager fm, ArrayList<SongsModel> nowPlayingList) {
+            super(fm);
+            this.nowPlayingList = nowPlayingList;
+            dataBundle = new Bundle();
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            dataBundle.putString(Constants.SONG_THUMB_PATH, nowPlayingList.get(position).getSongThumb());
+            ImageFragment imageFragment = new ImageFragment();
+            imageFragment.setArguments(dataBundle);
+            return imageFragment;
+        }
+
+        @Override
+        public int getCount() {
+            return nowPlayingList.size();
+        }
+
+        void addData(ArrayList<SongsModel> data){
+            nowPlayingList.addAll(data);
+            notifyDataSetChanged();
+        }
+
+        void replaceData(ArrayList<SongsModel> data){
+            nowPlayingList.clear();
+            nowPlayingList.addAll(data);
+            notifyDataSetChanged();
         }
     }
 }

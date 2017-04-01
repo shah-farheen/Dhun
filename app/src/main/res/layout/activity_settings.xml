@@ -4,7 +4,7 @@
     android:id="@+id/activity_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bits.farheen.dhun.SettingsActivity">
+    tools:context="com.bits.farheen.dhun.misc.SettingsActivity">
 
     <TextView
         android:id="@+id/text_change_ringtone"
@@ -16,5 +16,17 @@
         android:textSize="18sp"
         android:gravity="center_vertical"
         android:text="Change Phone Ringtone"/>
+
+    <TextView
+        android:id="@+id/text_send_message"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:textSize="18sp"
+        android:text="Send Message"
+        android:gravity="center_vertical"
+        android:layout_below="@id/text_change_ringtone"/>
 
 </RelativeLayout>

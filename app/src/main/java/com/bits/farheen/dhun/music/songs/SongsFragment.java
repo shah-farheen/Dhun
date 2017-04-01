@@ -1,4 +1,4 @@
-package com.bits.farheen.dhun;
+package com.bits.farheen.dhun.music.songs;
 
 
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bits.farheen.dhun.adapters.SongsListAdapter;
+import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.ArtistModel;
 import com.bits.farheen.dhun.models.SongsModel;

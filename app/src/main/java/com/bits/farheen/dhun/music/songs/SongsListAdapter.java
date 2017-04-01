@@ -1,4 +1,4 @@
-package com.bits.farheen.dhun.adapters;
+package com.bits.farheen.dhun.music.songs;
 
 import android.content.ContentUris;
 import android.content.Context;

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bits.farheen.dhun.ImageFragment">
+    tools:context="com.bits.farheen.dhun.nowplaying.ImageFragment">
 
     <ImageView
         android:id="@+id/image_song_thumb"

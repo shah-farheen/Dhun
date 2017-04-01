@@ -1,4 +1,4 @@
-package com.bits.farheen.dhun.adapters;
+package com.bits.farheen.dhun.music.albums;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

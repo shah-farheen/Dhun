@@ -1,4 +1,4 @@
-package com.bits.farheen.dhun;
+package com.bits.farheen.dhun.nowplaying;
 
 
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.utils.Constants;
 import com.bumptech.glide.Glide;
 

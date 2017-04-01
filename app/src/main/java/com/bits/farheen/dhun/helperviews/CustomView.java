@@ -2,6 +2,7 @@ package com.bits.farheen.dhun.helperviews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -32,4 +33,8 @@ public class CustomView extends View{
         super(context, attrs, defStyleAttr);
     }
 
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+    }
 }

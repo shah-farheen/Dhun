@@ -22,6 +22,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bits.farheen.dhun.misc.SettingsActivity;
+import com.bits.farheen.dhun.music.albums.AlbumDetailsFragment;
+import com.bits.farheen.dhun.music.artists.ArtistDetailsFragment;
 import com.bits.farheen.dhun.events.PauseMusic;
 import com.bits.farheen.dhun.events.PlayStatusChange;
 import com.bits.farheen.dhun.events.PositionChange;
@@ -29,6 +32,7 @@ import com.bits.farheen.dhun.events.QueueChange;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.ArtistModel;
 import com.bits.farheen.dhun.models.SongsModel;
+import com.bits.farheen.dhun.nowplaying.NowPlayingActivity;
 import com.bits.farheen.dhun.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

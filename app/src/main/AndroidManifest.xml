@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".SplashActivity">
+        </activity>
+
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,13 +23,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity">
-        </activity>
-
         <service android:name=".PlayMusicService" />
 
-        <activity android:name=".NowPlayingActivity" />
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".nowplaying.NowPlayingActivity" />
+        <activity android:name=".misc.SettingsActivity" />
 
         <receiver android:name=".utils.MusicIntentReceiver">
             <intent-filter>

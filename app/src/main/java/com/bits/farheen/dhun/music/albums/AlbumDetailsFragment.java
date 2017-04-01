@@ -1,4 +1,4 @@
-package com.bits.farheen.dhun;
+package com.bits.farheen.dhun.music.albums;
 
 
 import android.content.Context;
@@ -12,14 +12,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.bits.farheen.dhun.adapters.AlbumListAdapter;
-import com.bits.farheen.dhun.adapters.SongsListAdapter;
+import com.bits.farheen.dhun.R;
+import com.bits.farheen.dhun.music.songs.SongsListAdapter;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.ArtistModel;
 import com.bits.farheen.dhun.models.SongsModel;
 import com.bits.farheen.dhun.utils.Constants;
 import com.bits.farheen.dhun.utils.MediaQuery;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -30,16 +33,14 @@ import butterknife.ButterKnife;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ArtistDetailsFragment extends Fragment implements MediaQuery.QueryCompletionListener{
+public class AlbumDetailsFragment extends Fragment implements MediaQuery.QueryCompletionListener{
 
     private Context mContext;
     private Bundle dataBundle;
-    private MediaQuery mediaQuery;
     private SongsListAdapter songsListAdapter;
-    private AlbumListAdapter albumListAdapter;
-    private static final String TAG = "ArtistDetailsFragment";
+    private static final String TAG = "AlbumDetailsFragment";
 
-    public ArtistDetailsFragment() {
+    public AlbumDetailsFragment() {
         // Required empty public constructor
     }
 
@@ -53,30 +54,31 @@ public class ArtistDetailsFragment extends Fragment implements MediaQuery.QueryC
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataBundle = getArguments();
-        mediaQuery = new MediaQuery(mContext, getClass().getName(), this, new Handler());
+        MediaQuery mediaQuery = new MediaQuery(mContext, getClass().getName(), this, new Handler());
         songsListAdapter = new SongsListAdapter(new ArrayList<SongsModel>(), mContext);
-        albumListAdapter = new AlbumListAdapter(new ArrayList<AlbumModel>(), mContext);
-
-        mediaQuery.querySongs(MediaStore.Audio.Media.ARTIST_KEY,
-                new String[]{dataBundle.getString(Constants.ARTIST_KEY)});
-
-        mediaQuery.queryAlbums(MediaStore.Audio.Albums.ARTIST,
-                new String[]{dataBundle.getString(Constants.ARTIST_NAME)});
+        mediaQuery.querySongs(MediaStore.Audio.Media.ALBUM_KEY,
+                new String[]{dataBundle.getString(Constants.ALBUM_KEY)});
     }
 
-    @BindView(R.id.recycler_albums) RecyclerView recyclerAlbums;
+    @BindView(R.id.image_album_thumb) ImageView imageAlbumThumb;
+    @BindView(R.id.text_album_name) TextView textAlbumName;
+    @BindView(R.id.text_num_songs) TextView textNumSongs;
     @BindView(R.id.recycler_songs) RecyclerView recyclerSongs;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_artist_details, container, false);
+        View view = inflater.inflate(R.layout.fragment_album_details, container, false);
         ButterKnife.bind(this, view);
+
+        Glide.with(mContext).load(dataBundle.getString(Constants.ALBUM_ART))
+                .placeholder(R.drawable.music)
+                .into(imageAlbumThumb);
+        textAlbumName.setText(dataBundle.getString(Constants.ALBUM_NAME));
+        String stringNumSongs = dataBundle.getInt(Constants.NUM_SONGS) + " songs";
+        textNumSongs.setText(stringNumSongs);
 
         recyclerSongs.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerSongs.setAdapter(songsListAdapter);
-        recyclerAlbums.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
-        recyclerAlbums.setAdapter(albumListAdapter);
-        recyclerSongs.setNestedScrollingEnabled(false);
 
         return view;
     }
@@ -84,14 +86,11 @@ public class ArtistDetailsFragment extends Fragment implements MediaQuery.QueryC
     @Override
     public void songQueryCompleted(ArrayList<SongsModel> songsList) {
         songsListAdapter.addData(songsList);
-        for(SongsModel song : songsList){
-            mediaQuery.querySongThumb(song.getSongId(), song.getAlbumId());
-        }
     }
 
     @Override
     public void albumQueryCompleted(ArrayList<AlbumModel> albumList) {
-        albumListAdapter.addData(albumList);
+
     }
 
     @Override
@@ -101,6 +100,6 @@ public class ArtistDetailsFragment extends Fragment implements MediaQuery.QueryC
 
     @Override
     public void songThumbQueryCompleted(long songId, String songThumb) {
-        songsListAdapter.updateSongInfo(songId, songThumb);
+
     }
 }

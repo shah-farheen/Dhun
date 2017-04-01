@@ -1,18 +1,17 @@
-package com.bits.farheen.dhun;
-
+package com.bits.farheen.dhun.music.albums;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bits.farheen.dhun.adapters.ArtistsListAdapter;
+import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.models.AlbumModel;
 import com.bits.farheen.dhun.models.ArtistModel;
 import com.bits.farheen.dhun.models.SongsModel;
@@ -23,17 +22,16 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ArtistsFragment extends Fragment implements MediaQuery.QueryCompletionListener{
+public class AlbumsFragment extends Fragment implements MediaQuery.QueryCompletionListener{
 
     private Context mContext;
-    private ArtistsListAdapter artistsListAdapter;
-    private static final String TAG = "ArtistsFragment";
+    private AlbumListAdapter albumListAdapter;
+    private static final String TAG = "AlbumsFragment";
 
-    public ArtistsFragment() {
+    public AlbumsFragment() {
         // Required empty public constructor
     }
 
@@ -47,19 +45,19 @@ public class ArtistsFragment extends Fragment implements MediaQuery.QueryComplet
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MediaQuery mediaQuery = new MediaQuery(mContext, getClass().getName(), this, new Handler());
-        artistsListAdapter = new ArtistsListAdapter(new ArrayList<ArtistModel>(), mContext);
-        mediaQuery.queryArtists(null, null);
+        albumListAdapter = new AlbumListAdapter(new ArrayList<AlbumModel>(), mContext);
+        mediaQuery.queryAlbums(null, null);
     }
 
-    @BindView(R.id.recycler_artists) RecyclerView recyclerArtists;
+    @BindView(R.id.recycler_albums) RecyclerView recyclerAlbums;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_artists, container, false);
+        View view = inflater.inflate(R.layout.fragment_albums, container, false);
         ButterKnife.bind(this, view);
 
-        recyclerArtists.setLayoutManager(new LinearLayoutManager(mContext));
-        recyclerArtists.setAdapter(artistsListAdapter);
+        recyclerAlbums.setLayoutManager(new GridLayoutManager(mContext, 2));
+        recyclerAlbums.setAdapter(albumListAdapter);
 
         return view;
     }
@@ -71,12 +69,12 @@ public class ArtistsFragment extends Fragment implements MediaQuery.QueryComplet
 
     @Override
     public void albumQueryCompleted(ArrayList<AlbumModel> albumList) {
-
+        albumListAdapter.addData(albumList);
     }
 
     @Override
     public void artistQueryCompleted(ArrayList<ArtistModel> artistList) {
-        artistsListAdapter.addData(artistList);
+
     }
 
     @Override

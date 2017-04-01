@@ -1,4 +1,4 @@
-package com.bits.farheen.dhun;
+package com.bits.farheen.dhun.misc;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,9 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bits.farheen.dhun.R;
 import com.bits.farheen.dhun.utils.Constants;
 
 import butterknife.BindView;
@@ -20,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private Context mContext;
 
+    @BindView(R.id.text_send_message) TextView textSendMessage;
     @BindView(R.id.text_change_ringtone) TextView textChangeRingtone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,21 @@ public class SettingsActivity extends AppCompatActivity {
                         .putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Choose Ringtone")
                         .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, RingtoneManager.getActualDefaultRingtoneUri(mContext, RingtoneManager.TYPE_RINGTONE));
                 startActivityForResult(changeRingtoneIntent, Constants.CHANGE_RINGTONE_REQUEST_CODE);
+            }
+        });
+
+        textSendMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sendMessageIntent = new Intent(Intent.ACTION_SEND)
+                        .setType("text/plain")
+                        .putExtra(Intent.EXTRA_TEXT, "                  ");
+                if(sendMessageIntent.resolveActivity(getPackageManager()) != null){
+                    startActivity(sendMessageIntent);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "No app found", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
