@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bits.farheen.dhun.misc.PlaylistsFragment;
 import com.bits.farheen.dhun.music.albums.AlbumsFragment;
 import com.bits.farheen.dhun.music.artists.ArtistsFragment;
-import com.bits.farheen.dhun.misc.PlaylistsFragment;
 import com.bits.farheen.dhun.music.songs.SongsFragment;
 
 import butterknife.BindView;
