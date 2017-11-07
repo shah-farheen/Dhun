@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         app:tabMode="fixed"
         app:tabBackground="@color/colorPrimary"
-        app:tabTextColor="@color/lightGrey"
-        app:tabSelectedTextColor="@android:color/white"/>
+        app:tabTextColor="@color/colorDivider"
+        app:tabSelectedTextColor="@color/colorWhite"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"

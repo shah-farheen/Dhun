@@ -21,14 +21,14 @@
         android:gravity="center_vertical"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:background="#7E7D80"
+        android:background="@color/colorPrimary"
         android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/text_song_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textAppearance="@style/LightText"
             android:text="Gham ka Khazana"/>
 
         <TextView
@@ -36,6 +36,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/text_song_name"
+            android:textAppearance="@style/LightText"
+            android:textSize="16sp"
             android:text="Jagjit Singh"/>
 
         <ImageView

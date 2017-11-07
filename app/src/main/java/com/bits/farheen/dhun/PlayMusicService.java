@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.os.PowerManager;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.widget.RemoteViews;
 
 import com.bits.farheen.dhun.events.PauseMusic;
@@ -203,7 +205,12 @@ public class PlayMusicService extends Service implements MediaPlayer.OnCompletio
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.play)
                 .setContentIntent(musicPendingIntent)
-                .setContent(notificationLayout);
+                .setContentTitle(currentQueue.get(currentPlayingPosition).getTitle())
+                .setContentText(currentQueue.get(currentPlayingPosition).getArtist())
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.music))
+                .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle()
+                        );
+//                .setContent(notificationLayout);
         return builder.build();
     }
 
