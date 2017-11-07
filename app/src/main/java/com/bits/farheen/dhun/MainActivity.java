@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        test branch created
+
         ButterKnife.bind(this);
         mContext = this;
         gson = new Gson();
